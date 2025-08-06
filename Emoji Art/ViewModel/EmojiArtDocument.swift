@@ -5,14 +5,16 @@
 //  Created by Nicholas Alba on 6/14/25.
 //
 
+import CoreTransferable
 import SwiftUI
+import UniformTypeIdentifiers
 
 class EmojiArtDocument: ObservableObject {
     @Published private var emojiArt = EmojiArt()
         
     init() {
-        emojiArt.addEmoji("🤔", at: .init(x: 200, y: -100), size: 50)
-        emojiArt.addEmoji("🐋", at: .init(x: -150, y: 100), size: 100)
+        emojiArt.addEmoji("🤔", at: .init(x: 200, y: -100), size: 25)
+        emojiArt.addEmoji("🐋", at: .init(x: -150, y: 100), size: 50)
     }
         
     var emojis: [Emoji] {
@@ -32,12 +34,33 @@ class EmojiArtDocument: ObservableObject {
     func addEmoji(_ emoji: String, at position: Emoji.Position, size: CGFloat) {
         emojiArt.addEmoji(emoji, at: position, size: Int(size))
     }
+    
+    func moveEmoji(atIndex index: Int, to newPosition: Emoji.Position) {
+        emojiArt.moveEmoji(atIndex: index, to: newPosition)
+    }
+    
+    func resizeEmoji(atIndex index: Int, to newSize: Int) {
+        emojiArt.resizeEmoji(atIndex: index, to: newSize)
+    }
+    
+    func removeEmoji(atIndex index: Int) {
+        emojiArt.removeEmoji(atIndex: index)
+    }
 }
 
-extension EmojiArt.Emoji {
-    var font: Font {
-        .system(size: CGFloat(size))
+extension EmojiArt.Emoji: Transferable {
+    func font(scaleFactor: CGFloat) -> Font {
+        let size = CGFloat(self.size) * scaleFactor
+        return .system(size: size)
     }
+    
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(for: EmojiArt.Emoji.self, contentType: .emoji)
+    }
+}
+
+extension UTType {
+    static var emoji = UTType(exportedAs: "com.nicholasdalba.emoji")
 }
 
 extension EmojiArt.Emoji.Position {

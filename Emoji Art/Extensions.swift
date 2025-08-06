@@ -38,6 +38,22 @@ extension CGOffset {
     }
 }
 
+extension CGPoint {
+    static func +(left: CGPoint, right: CGPoint) -> CGPoint {
+        let x = left.x + right.x
+        let y = left.y + right.y
+        return CGPoint(x: x, y: y)
+    }
+}
+
+extension Emoji.Position {
+    static func +(left: Emoji.Position, right: Emoji.Position) -> Emoji.Position {
+        let x = left.x + right.x
+        let y = left.y + right.y
+        return Emoji.Position(x: x, y: y)
+    }
+}
+
 extension AnyTransition {
     static let rollUp: AnyTransition = .asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .top))
     

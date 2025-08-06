@@ -29,13 +29,25 @@ struct EmojiArt {
         emojiCount += 1
     }
     
-    struct Emoji: Identifiable {
+    mutating func moveEmoji(atIndex index: Int, to position: Emoji.Position) {
+        emojis[index].position = position
+    }
+    
+    mutating func resizeEmoji(atIndex index: Int, to newSize: Int) {
+        emojis[index].size = newSize
+    }
+    
+    mutating func removeEmoji(atIndex index: Int) {
+        emojis.remove(at: index)
+    }
+    
+    struct Emoji: Identifiable, Codable {
         let emoji: String
         var position: Position
         var size: Int
         var id: Int
         
-        struct Position {
+        struct Position: Codable {
             var x: Int
             var y: Int
             
