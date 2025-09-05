@@ -9,15 +9,24 @@ import Foundation
 
 typealias Emoji = EmojiArt.Emoji
 
-struct EmojiArt {
-    var background: URL? {
-        didSet {
-            print("Background is now \(String(describing: background))")
-        }
-    }
+struct EmojiArt: Codable {
+    var background: URL?
     private(set) var emojis: [Emoji] = []
-
     private var emojiCount = 0
+
+    func json() throws -> Data {
+        let json = try JSONEncoder().encode(self)
+        if let jsonString = String(data: json, encoding: .utf8) {
+            print("EmojiArt Encoding: \(jsonString)")
+        }
+        return json
+    }
+    
+    init(json: Data) throws {
+        self = try JSONDecoder().decode(EmojiArt.self, from: json)
+    }
+    
+    init() {}
     
     mutating func addEmoji(_ emoji: String, at position: Emoji.Position, size: Int) {
         emojis.append(Emoji(

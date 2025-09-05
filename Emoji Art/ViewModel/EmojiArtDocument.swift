@@ -9,12 +9,37 @@ import CoreTransferable
 import SwiftUI
 import UniformTypeIdentifiers
 
+
 class EmojiArtDocument: ObservableObject {
-    @Published private var emojiArt = EmojiArt()
-        
+    @Published private var emojiArt = EmojiArt() {
+        didSet {
+            autosave()
+        }
+    }
+    
+    private func autosave() {
+        do {
+            let data = try emojiArt.json()
+            try data.write(to: documentURL)
+            print("autosaved to \(documentURL)")
+            
+        } catch let error {
+            print("Error saving emoji art document: \(error.localizedDescription)")
+        }
+    }
+   
+    var documentURL: URL {
+        URL.documentsDirectory.appendingPathComponent("document.emojiart")
+    }
+
+    
     init() {
-        emojiArt.addEmoji("🤔", at: .init(x: 200, y: -100), size: 25)
-        emojiArt.addEmoji("🐋", at: .init(x: -150, y: 100), size: 50)
+        // emojiArt.addEmoji("🤔", at: .init(x: 200, y: -100), size: 25)
+        // emojiArt.addEmoji("🐋", at: .init(x: -150, y: 100), size: 50)
+        
+        if let data = try? Data(contentsOf: documentURL), let emojiArt = try? EmojiArt(json: data) {
+            self.emojiArt = emojiArt
+        }
     }
         
     var emojis: [Emoji] {
@@ -69,4 +94,8 @@ extension EmojiArt.Emoji.Position {
         let center = geometry.frame(in: .local).center
         return CGPoint(x: center.x + CGFloat(x), y: center.y - CGFloat(y))
     }
+}
+
+struct DummyError: LocalizedError {
+    var errorDescription: String? { "oh no :o" }
 }
